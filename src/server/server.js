@@ -16,7 +16,7 @@ import initialState from '../frontend/initialState';
 import serverRoutes from '../frontend/routes/serverRoutes';
 import getManifest from './getManifest';
 
-import cookieParser from 'cookie=parser';
+import cookieParser from 'cookie-parser';
 import boom from '@hapi/boom';
 import passport from 'passport';
 import axios from 'axios';
