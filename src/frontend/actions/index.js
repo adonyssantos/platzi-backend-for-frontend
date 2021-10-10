@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export const setFavorite = payload => ({
   type: 'SET_FAVORITE',
   payload,
@@ -33,4 +35,16 @@ export const setError = payload => ({
   payload,
 });
 
-export { setFavorite as default }
+export const registerUser = (payload, redirectUrl) => {
+  return dispatch => {
+    axios
+      .post('/auth/sign-up', payload)
+      .then(({ data }) => dispatch(registerRequest(data)))
+      .then(() => {
+        window.location.href = redirectUrl;
+      })
+      .catch(error => dispatch(setError(error)));
+  };
+};
+
+export { setFavorite as default };

@@ -4,6 +4,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import webpack from 'webpack';
+import cookieParser from 'cookie-parser';
+import boom from '@hapi/boom';
+import passport from 'passport';
+import axios from 'axios';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
@@ -15,11 +19,6 @@ import Layout from '../frontend/components/Layout';
 import initialState from '../frontend/initialState';
 import serverRoutes from '../frontend/routes/serverRoutes';
 import getManifest from './getManifest';
-
-import cookieParser from 'cookie-parser';
-import boom from '@hapi/boom';
-import passport from 'passport';
-import axios from 'axios';
 
 dotenv.config();
 
@@ -92,7 +91,7 @@ const renderApp = (req, res) => {
   res.send(setResponse(html, preloadedState, req.hashManifest));
 };
 
-pp.post('/auth/sign-in', async function (req, res, next) {
+app.post('/auth/sign-in', async function (req, res, next) {
   passport.authenticate('basic', function (error, data) {
     try {
       if (error || !data) {
@@ -123,13 +122,21 @@ app.post('/auth/sign-up', async function (req, res, next) {
   const { body: user } = req;
 
   try {
-    await axios({
-      url: `${config.apiUrl}/api/auth/sign-up`,
+    const userData = await axios({
+      url: `${process.env.API_URL}/api/auth/sign-up`,
       method: 'post',
-      data: user,
+      data: {
+        email: user.email,
+        name: user.passport,
+        passport: user.password,
+      },
     });
 
-    res.status(201).json({ message: 'user created' });
+    res.status(201).json({
+      name: req.body.name,
+      email: req.body.email,
+      id: userData.data.id,
+    });
   } catch (error) {
     next(error);
   }
